@@ -1,0 +1,77 @@
+function renameOnly(){
+    const destinationFolderId = '1NJshC3Gn_mHIJmh7ceADyx9rv1Rw1DsA'; 
+    findAndReplaceCharactersInFolder(destinationFolderId);
+
+}
+
+function copyAndRenameFiles() {
+  // Replace these with your actual folder IDs
+  // แทนที่ค่าเหล่านี้ด้วยรหัสโฟลเดอร์จริงของคุณ
+  const sourceFolderId = '1Fr4PVo9cvKJyAiFru0E7dnU8RhHWPqfj'; 
+  const destinationFolderId = '1CwS457ilGOs0W04BzaBt7c5sq-tbRa5L'; 
+  //const newFileNamePrefix = 'New_File_'; 
+
+  try {
+    const sourceFolder = DriveApp.getFolderById(sourceFolderId);
+    const destinationFolder = DriveApp.getFolderById(destinationFolderId);
+    
+    // Get all files in the source folder
+    const files = sourceFolder.getFiles();
+    let fileCount = 0;
+
+    // Loop through each file in the source folder
+    while (files.hasNext()) {
+      const file = files.next();
+      fileCount++;
+      
+      // Copy the file to the destination folder
+      const newFile = file.makeCopy(destinationFolder);
+
+      // Create a new name for the copied file
+      //const newName = newFileNamePrefix + fileCount;
+      //newFile.setName(newName);
+      
+      //Logger.log(`Copied and renamed file: ${file.getName()} -> ${newName}`);
+      Logger.log(`Copied and renamed file: ${file.getName()}`);
+    }
+    
+    if (fileCount === 0) {
+      Logger.log('No files found in the source folder.');
+    } else {
+      Logger.log(`Successfully copied and renamed ${fileCount} files.`);
+      // Call the new function to find and replace characters in the new folder
+      findAndReplaceCharactersInFolder(destinationFolderId);
+    }
+
+  } catch (error) {
+    Logger.log(`An error occurred: ${error.toString()}`);
+  }
+}
+
+function findAndReplaceCharactersInFolder(folderId) {
+  try {
+    const folder = DriveApp.getFolderById(folderId);
+    const files = folder.getFiles();
+
+    while (files.hasNext()) {
+      const file = files.next();
+      let fileName = file.getName();
+      
+      // Replace '/' with '-'
+      fileName = fileName.replace(/\//g, '-');
+
+      // Replace '+' with '-'
+      fileName = fileName.replace(/\+/g, '-');
+      
+      // Replace ':' with '-'
+      fileName = fileName.replace(/\:/g, '-');
+
+      if (fileName !== file.getName()) {
+        file.setName(fileName);
+        Logger.log(`Renamed file: ${file.getName()} -> ${fileName}`);
+      }
+    }
+  } catch (error) {
+    Logger.log(`An error occurred while renaming files: ${error.toString()}`);
+  }
+}
